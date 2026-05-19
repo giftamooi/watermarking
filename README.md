@@ -4,8 +4,8 @@
 Program ini mengimplementasikan *invisible watermarking* pada citra digital menggunakan metode DCT (*Discrete Cosine Transform*). Watermark berupa deretan bit acak yang disisipkan secara tak kasat mata ke dalam gambar. Ketahanan watermark kemudian dievaluasi terhadap kompresi JPEG dengan berbagai nilai *Quality Factor* (QF).
 
 ## Algoritma yang Digunakan
-- **DCT (Discrete Cosine Transform)** — mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah
-- **YCrCb Color Space** — gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
+- **DCT (Discrete Cosine Transform)** : mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah
+- **YCrCb Color Space** : gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
 
 ## Proses Watermarking
 
