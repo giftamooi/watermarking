@@ -7,10 +7,29 @@ def load_image(path):
     img = cv2.imread(path)
     return img
 
-def generate_watermark(n_blocks, seed=42):
-    #Buat watermark acak sejumlah blok yang ada
-    np.random.seed(seed)
-    watermark = np.random.randint(0, 2, n_blocks).astype(np.float32)
+def generate_watermark(n_blocks, h8=None, w8=None, seed=42):
+    #Buat watermark berbentuk teks GIFMOOI
+    from PIL import Image, ImageDraw, ImageFont
+
+    rows = h8 // 8
+    cols = w8 // 8
+
+    # Buat gambar hitam sesuai ukuran blok
+    img = Image.new('L', (cols, rows), 0)
+    draw = ImageDraw.Draw(img)
+
+    # Tulis teks GIFMOOI dengan font lebih besar
+    text = "GIFMOOI"
+    font = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", size=35)
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_w = bbox[2] - bbox[0]
+    text_h = bbox[3] - bbox[1]
+    x = (cols - text_w) // 2
+    y = (rows - text_h) // 2
+    draw.text((x, y), text, fill=255, font=font)
+
+    watermark = np.array(img).flatten().astype(np.float32)
+    watermark = (watermark > 127).astype(np.float32)
     return watermark
 
 def dct2(block):
