@@ -1,43 +1,81 @@
 # Watermarking Citra Digital - Sistem Multimedia
 
+
 ## Deskripsi
-Program ini mengimplementasikan *invisible watermarking* pada citra digital menggunakan metode DCT (*Discrete Cosine Transform*). Watermark berupa deretan bit acak yang disisipkan secara tak kasat mata ke dalam gambar. Ketahanan watermark kemudian dievaluasi terhadap kompresi JPEG dengan berbagai nilai *Quality Factor* (QF).
+Program ini mengimplementasikan *invisible watermarking* pada citra digital menggunakan metode DCT (*Discrete Cosine Transform*). Watermark berupa pola teks "GIFMOOI" yang disisipkan secara tak kasat mata ke dalam gambar. Ketahanan watermark kemudian dievaluasi terhadap kompresi JPEG dengan berbagai nilai *Quality Factor* (QF).
+
+---
 
 ## Algoritma yang Digunakan
-- **DCT (Discrete Cosine Transform)** : mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah
-- **YCrCb Color Space** : gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
+- **DCT (Discrete Cosine Transform)** — mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah tanpa mengubah tampilan visual gambar
+- **YCrCb Color Space** — gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
+
+---
 
 ## Proses Watermarking
 
-### 1. Load Gambar
+### 1. Gambar Original
 Gambar wajah dibaca dalam format berwarna (BGR) menggunakan OpenCV.
 
-### 2. Konversi ke YCrCb
-Gambar dikonversi dari format BGR ke YCrCb. Ruang warna ini memisahkan informasi kecerahan (channel Y) dari informasi warna (channel Cr dan Cb). Watermark hanya disisipkan ke channel Y agar warna gambar tetap tidak berubah secara visual.
+![Original](output/1_original.png)
 
-### 3. Pembuatan Watermark Acak
-Watermark dibuat berupa array acak berisi nilai 0 dan 1 sebanyak jumlah blok 8x8 pixel yang ada di gambar. Nilai seed (seed=42) digunakan agar watermark yang dihasilkan selalu sama setiap kali program dijalankan.
+---
+
+### 2. Konversi YCrCb
+Gambar dikonversi dari format BGR ke ruang warna YCrCb. Ruang warna ini memisahkan informasi kecerahan (channel Y) dari informasi warna (channel Cr dan Cb). Watermark hanya disisipkan ke channel Y agar tampilan warna gambar tidak berubah secara visual.
+
+![Konversi YCrCb](output/2_konversi_ycrcb.png)
+
+---
+
+### 3. Pembuatan Watermark
+Watermark dibuat dalam bentuk teks "GIFMOOI" berukuran sesuai jumlah blok 8x8 yang ada di gambar. Piksel putih bernilai 1 dan piksel hitam bernilai 0.
+
+![Watermark](output/3_watermark.png)
+
+---
 
 ### 4. Penyisipan Watermark (Embed)
-Channel Y dibagi menjadi blok-blok berukuran 8x8 pixel. Setiap blok kemudian diproses sebagai berikut:
-- Blok di-transformasi menggunakan DCT sehingga menghasilkan koefisien-koefisien frekuensi
-- Bit watermark disisipkan ke 3 koefisien frekuensi menengah dengan menambahkan nilai alpha (kekuatan watermark)
-- Blok dikembalikan ke domain spasial menggunakan Inverse DCT
+Channel Y dibagi menjadi blok-blok 8x8 pixel. Setiap blok ditransformasi menggunakan DCT, lalu bit watermark disisipkan ke 3 koefisien frekuensi menengah. Blok kemudian dikembalikan ke domain spasial menggunakan Inverse DCT. Gambar selisih (diperbesar) menunjukkan lokasi perubahan akibat penyisipan watermark — perubahannya sangat kecil sehingga tidak terlihat secara visual.
 
-Setelah semua blok diproses, channel Y yang telah mengandung watermark digabungkan kembali dengan channel Cr dan Cb, lalu dikonversi balik ke format BGR. Hasilnya adalah gambar berwarna yang telah mengandung watermark secara invisible.
+![Penyisipan Watermark](output/4_penyisipan_watermark.png)
+
+---
 
 ### 5. Kompresi JPEG
-Gambar yang telah di-watermark dikompres menggunakan kompresi JPEG dengan 5 nilai Quality Factor yang berbeda, yaitu QF = 10, 30, 50, 70, dan 90. Semakin kecil nilai QF, semakin besar tingkat kompresi dan semakin banyak detail gambar yang hilang.
+Gambar yang telah di-watermark dikompres menggunakan kompresi JPEG dengan 5 nilai Quality Factor (QF) yang berbeda. Semakin kecil nilai QF, semakin besar tingkat kompresi dan semakin banyak detail gambar yang hilang.
+
+![Kompresi JPEG](output/5_kompresi_jpeg.png)
+
+---
 
 ### 6. Ekstraksi Watermark
-Dari setiap gambar yang telah dikompres, channel Y-nya dibaca dan dibandingkan dengan channel Y gambar asli menggunakan DCT. Selisih koefisien frekuensi antara keduanya merepresentasikan watermark yang berhasil diekstrak.
+Dari setiap gambar yang telah dikompres, watermark diekstrak dengan membandingkan koefisien DCT gambar asli dan gambar yang dikompres. Terlihat bahwa pada QF = 10, watermark yang diekstrak hampir tidak terbaca (korelasi mendekati 0), sedangkan pada QF 30 ke atas watermark masih terbaca dengan baik (korelasi mendekati 1).
 
-### 7. Evaluasi
-Watermark hasil ekstraksi dibandingkan dengan watermark asli menggunakan nilai korelasi. Nilai korelasi berkisar antara -1 hingga 1. Jika nilai korelasi lebih dari 0.3, watermark dinyatakan masih dapat terbaca. Jika di bawah 0.3, watermark dinyatakan tidak dapat diekstrak akibat kerusakan yang disebabkan oleh kompresi.
+![Ekstraksi Watermark](output/6_ekstraksi_watermark.png)
+
+---
+
+### 7. Evaluasi Ketahanan Watermark
+Grafik berikut menunjukkan nilai korelasi antara watermark asli dan watermark yang diekstrak pada setiap nilai QF. Garis merah putus-putus adalah threshold 0.3 — di atas threshold berarti watermark masih terbaca, di bawah berarti tidak terbaca.
+
+![Grafik Korelasi](output/7_grafik_korelasi.png)
+
+---
+
+### 8. Output Terminal
+![Terminal Output](output/8_terminal_output.png)
+
+---
+
+## Kesimpulan
+Watermark tidak dapat diekstrak pada **QF = 10** karena kompresi yang terlalu agresif merusak koefisien DCT tempat watermark disisipkan. Pada QF 30 ke atas, watermark masih dapat diekstrak dengan korelasi mendekati 1.0.
+
+---
 
 ## Requirements
 ```
-pip install numpy opencv-python scipy matplotlib
+pip install numpy opencv-python scipy matplotlib pillow
 ```
 
 ## Cara Menjalankan
@@ -48,8 +86,3 @@ pip install numpy opencv-python scipy matplotlib
 python main.py
 ```
 4. Hasil evaluasi akan tersimpan di folder `output/`
-
-## Output
-- Grafik korelasi watermark terhadap nilai Quality Factor (QF)
-- Gambar original, gambar setelah watermark, dan gambar hasil kompresi pada setiap QF
-- Status watermark terbaca/tidak terbaca pada terminal
