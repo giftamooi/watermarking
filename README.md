@@ -7,8 +7,8 @@ Program ini mengimplementasikan *invisible watermarking* pada citra digital meng
 ---
 
 ## Algoritma yang Digunakan
-- **DCT (Discrete Cosine Transform)** — mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah tanpa mengubah tampilan visual gambar
-- **YCrCb Color Space** — gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
+- **DCT (Discrete Cosine Transform)** : mengubah blok pixel ke domain frekuensi sehingga watermark dapat disisipkan ke koefisien frekuensi menengah tanpa mengubah tampilan visual gambar
+- **YCrCb Color Space** : gambar dikonversi ke ruang warna YCrCb agar watermark hanya disisipkan ke channel Y (luminance/kecerahan), sehingga warna gambar tidak berubah
 
 ---
 
@@ -36,7 +36,7 @@ Watermark dibuat dalam bentuk teks "GIFMOOI" berukuran sesuai jumlah blok 8x8 ya
 ---
 
 ### 4. Penyisipan Watermark (Embed)
-Channel Y dibagi menjadi blok-blok 8x8 pixel. Setiap blok ditransformasi menggunakan DCT, lalu bit watermark disisipkan ke 3 koefisien frekuensi menengah. Blok kemudian dikembalikan ke domain spasial menggunakan Inverse DCT. Gambar selisih (diperbesar) menunjukkan lokasi perubahan akibat penyisipan watermark — perubahannya sangat kecil sehingga tidak terlihat secara visual.
+Channel Y dibagi menjadi blok-blok 8x8 pixel. Setiap blok ditransformasi menggunakan DCT, lalu bit watermark disisipkan ke 3 koefisien frekuensi menengah. Blok kemudian dikembalikan ke domain spasial menggunakan Inverse DCT. Gambar selisih (diperbesar) menunjukkan lokasi perubahan akibat penyisipan watermark. Perubahannya sangat kecil sehingga tidak terlihat secara visual.
 
 ![Penyisipan Watermark](output/4_penyisipan_watermark.png)
 
@@ -57,7 +57,7 @@ Dari setiap gambar yang telah dikompres, watermark diekstrak dengan membandingka
 ---
 
 ### 7. Evaluasi Ketahanan Watermark
-Grafik berikut menunjukkan nilai korelasi antara watermark asli dan watermark yang diekstrak pada setiap nilai QF. Garis merah putus-putus adalah threshold 0.3 — di atas threshold berarti watermark masih terbaca, di bawah berarti tidak terbaca.
+Grafik berikut menunjukkan nilai korelasi antara watermark asli dan watermark yang diekstrak pada setiap nilai QF. Garis merah putus-putus adalah threshold 0.3. Di atas threshold berarti watermark masih terbaca, di bawah berarti tidak terbaca.
 
 ![Grafik Korelasi](output/7_grafik_korelasi.png)
 
